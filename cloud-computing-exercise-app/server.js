@@ -134,17 +134,24 @@ app.put('/api/books/:id', (req, res) => {
     language: req.body.language 
   };
 
-  db.books.updateMany(
-    { _id:  bookId },
-    { $set: {
+  db.books.findByIdAndUpdate(
+    bookId,
+    {
       title: req.body.title, 
       author: req.body.author, 
       releaseDate: req.body.releaseDate, 
       genre: req.body.genre, 
       rating: req.body.rating, 
       language: req.body.language 
-    } }
-  );
+    },
+    (err, result) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(`${result.modifiedCount} documents updated`);
+    }
+  }
+                              );
   res.json(updatedBookInfo);
 });
 /*
@@ -163,14 +170,14 @@ app.delete('/api/books/:id', (req, res) => {
    * Send the deleted book information as a JSON object
    */
 
-  db.books.findOneAndDelete({ _id: bookId }, (err, deletedBook) => {
+  db.books.findByIdAndDelete(bookId, (err, deletedBook) => {
     if (err) {
-      console.log(err);
-    } else {
-      // var deletedBook = {};
-      res.json(deletedBook);
+      console.error('Error deleting book:', err);
+      return;
     }
+    res.json(deletedBook);
   });
+  
 });
 
 
