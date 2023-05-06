@@ -42,6 +42,9 @@ app.get('/api', (req, res) => {
       {method: 'GET', path: '/api', description: 'Describes all available endpoints'},
       {method: 'GET', path: '/api/profile', description: 'Data about me'},
       {method: 'GET', path: '/api/books/', description: 'Get All books information'},
+      {method: 'POST', path: '/api/books/', description: 'Add a book information into database'},
+      {method: 'PUT', path: '/api/books/:id', description: 'Update a book information based upon the specified ID'},
+      {method: 'DELETE', path: '/api/books/:id', description: 'Delete a book based upon the specified ID'},
       // TODO: Write other API end-points description here like above
     ]
   })
@@ -49,17 +52,17 @@ app.get('/api', (req, res) => {
 // TODO:  Fill the values
 app.get('/api/profile', (req, res) => {
   res.json({
-    'name': '',
-    'homeCountry': '',
-    'degreeProgram': '',//informatics or CSE.. etc
-    'email': '',
+    'name': 'Anil Cenk',
+    'homeCountry': 'TURKIYE',
+    'degreeProgram': 'CSE',//informatics or CSE.. etc
+    'email': 'anilcenk@gmail.com',
     'deployedURLLink': '',//leave this blank for the first exercise
     'apiDocumentationURL': '', //leave this also blank for the first exercise
-    'currentCity': '',
-    'hobbies': []
-
+    'currentCity': 'Munich',
+    'hobbies': ['rope pulling', 'bottle flip game', 'wheel launcher', 'smash apple game']
   })
 });
+
 /*
  * Get All books information
  */
@@ -91,7 +94,17 @@ app.post('/api/books/', (req, res) => {
   /*
    * return the new book information object as json
    */
-  var newBook = {};
+  var newBook = {
+    title: req.body.title, // title of the book
+    author: req.body.author, // name of the first author
+    releaseDate: req.body.releaseDate, // release date of the book
+    genre: req.body.genre, //like fiction or non fiction
+    rating: req.body.rating, // rating if you have read it out of 5
+    language: req.body.language // language in which the book is released};
+  };
+  db.books.insertMany(newBook, function(err, res) {
+    if (err) throw err;
+  });
   res.json(newBook);
 });
 
@@ -112,7 +125,26 @@ app.put('/api/books/:id', (req, res) => {
   /*
    * Send the updated book information as a JSON object
    */
-  var updatedBookInfo = {};
+  var updatedBookInfo = {
+    title: req.body.title, 
+    author: req.body.author, 
+    releaseDate: req.body.releaseDate, 
+    genre: req.body.genre, 
+    rating: req.body.rating, 
+    language: req.body.language 
+  };
+
+  db.books.updateMany(
+    { _id:  bookId },
+    { $set: {
+      title: req.body.title, 
+      author: req.body.author, 
+      releaseDate: req.body.releaseDate, 
+      genre: req.body.genre, 
+      rating: req.body.rating, 
+      language: req.body.language 
+    } }
+  );
   res.json(updatedBookInfo);
 });
 /*
@@ -130,8 +162,15 @@ app.delete('/api/books/:id', (req, res) => {
   /*
    * Send the deleted book information as a JSON object
    */
-  var deletedBook = {};
-  res.json(deletedBook);
+
+  db.books.findOneAndDelete({ _id: bookId }, (err, deletedBook) => {
+    if (err) {
+      console.log(err);
+    } else {
+      // var deletedBook = {};
+      res.json(deletedBook);
+    }
+  });
 });
 
 
