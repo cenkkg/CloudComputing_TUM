@@ -148,7 +148,6 @@ app.put('/api/books/:id', (req, res) => {
     if (err) {
       console.log(err);
     } else {
-      console.log(`${result.modifiedCount} documents updated`);
     }
   }
                               );
@@ -177,7 +176,7 @@ app.delete('/api/books/:id', (req, res) => {
     }
     res.json(deletedBook);
   });
-  
+
 });
 
 
